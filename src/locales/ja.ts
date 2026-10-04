@@ -44,6 +44,9 @@ export const jaMessages: LocaleMessages = {
     unavailableMedia: 'この投稿には、ここではプレビューできない大きな動画が含まれています。',
     unavailableMediaWithDuration: 'この投稿には、ここではプレビューできない{duration}の大きな動画が含まれています。',
     viewOriginalOnTelegram: 'Telegram で元の投稿を見る',
+    attachmentFallbackName: '添付ファイル',
+    attachmentTelegramOnly: 'Telegram ではこのファイルの直接ダウンロードリンクが公開されていません。',
+    openAttachmentOnTelegram: 'Telegram で添付ファイルを開く',
   },
   post: {
     backToFeed: 'フィードに戻る',

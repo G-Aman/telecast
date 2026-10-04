@@ -3,7 +3,7 @@
 import type { AppLocale } from '@/lib/i18n'
 import type { ChannelPost } from '@/lib/types'
 import type { LocaleMessages } from '@/locales/en'
-import { Eye, Tag, VideoOff } from 'lucide-react'
+import { Eye, FileArchive, Tag, VideoOff } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Badge } from '@/components/ui/badge'
 import { localizePath } from '@/lib/i18n'
@@ -115,6 +115,35 @@ export function PostCard({
                 </div>
               )
             : null}
+
+          {post.attachments?.map(attachment => (
+            <div
+              key={`${attachment.url}-${attachment.name}`}
+              className="mb-3 flex items-start gap-2 rounded-lg border bg-muted/60 px-3 py-2 text-[13px] leading-5 text-muted-foreground"
+              role="note"
+            >
+              <FileArchive className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+              <div className="min-w-0">
+                <p className="truncate font-medium text-foreground" title={attachment.name || messages.feed.attachmentFallbackName}>
+                  {attachment.name || messages.feed.attachmentFallbackName}
+                </p>
+                <p>
+                  {attachment.size ? `${attachment.size} · ` : null}
+                  {messages.feed.attachmentTelegramOnly}
+                  {' '}
+                  <a
+                    href={attachment.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link-smooth font-medium text-foreground"
+                  >
+                    {messages.feed.openAttachmentOnTelegram}
+                  </a>
+                  .
+                </p>
+              </div>
+            </div>
+          ))}
 
           {post.content
             ? <div className="prose-telegram" dangerouslySetInnerHTML={{ __html: post.content }} />

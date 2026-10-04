@@ -42,6 +42,9 @@ export interface LocaleMessages {
     unavailableMedia: string
     unavailableMediaWithDuration: string
     viewOriginalOnTelegram: string
+    attachmentFallbackName: string
+    attachmentTelegramOnly: string
+    openAttachmentOnTelegram: string
   }
   post: {
     backToFeed: string
@@ -138,6 +141,9 @@ export const enMessages: LocaleMessages = {
     unavailableMedia: 'This post contains a video that is too large to preview here.',
     unavailableMediaWithDuration: 'This post contains a {duration} video that is too large to preview here.',
     viewOriginalOnTelegram: 'View the original post on Telegram',
+    attachmentFallbackName: 'File attachment',
+    attachmentTelegramOnly: 'Telegram does not provide a direct web download for this file.',
+    openAttachmentOnTelegram: 'Open the attachment in Telegram',
   },
   post: {
     backToFeed: 'Back to Feed',

@@ -20,11 +20,15 @@ function toSearchDocument(post: ChannelPost): SearchDocument {
   const tagText = post.tags
     .flatMap(tag => [tag, `#${tag}`])
     .join(' ')
+  const attachmentText = post.attachments
+    ?.flatMap(attachment => [attachment.name, attachment.size])
+    .filter(Boolean)
+    .join(' ') || ''
 
   return {
     id: post.id,
     title: post.title || '',
-    text: [post.text, stripHtmlTags(post.content)].filter(Boolean).join(' '),
+    text: [post.text, stripHtmlTags(post.content), attachmentText].filter(Boolean).join(' '),
     tags: tagText,
     datetime: post.datetime,
   }

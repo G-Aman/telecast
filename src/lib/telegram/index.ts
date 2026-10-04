@@ -1,4 +1,4 @@
-import type { ChannelInfo, ChannelPost, ChannelReaction, UnavailableMedia } from '@/lib/types'
+import type { ChannelInfo, ChannelPost, ChannelReaction, DocumentAttachment, UnavailableMedia } from '@/lib/types'
 import * as cheerio from 'cheerio'
 import flourite from 'flourite'
 import { LRUCache } from 'lru-cache'
@@ -270,6 +270,23 @@ function getVideo($: cheerio.CheerioAPI, item: cheerio.Element, staticProxy: str
   return `${$.html(video)}${$.html(roundVideo)}`
 }
 
+function getTelegramPostUrl(channel: string, postId: string, rawUrl = '') {
+  const fallbackUrl = `https://t.me/${encodeURIComponent(channel.replace(/^@/, ''))}/${encodeURIComponent(postId)}`
+  let url = fallbackUrl
+
+  try {
+    const parsedUrl = new URL(rawUrl.trim() || fallbackUrl, 'https://t.me')
+    if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+      url = parsedUrl.toString()
+    }
+  }
+  catch {
+    // Fall back to the canonical Telegram post URL.
+  }
+
+  return url
+}
+
 function getUnavailableMedia(messageNode: cheerio.Cheerio<any>, channel: string, postId: string): UnavailableMedia | undefined {
   const player = messageNode.find('.tgme_widget_message_video_player.not_supported').first()
   if (!player.length) {
@@ -282,22 +299,38 @@ function getUnavailableMedia(messageNode: cheerio.Cheerio<any>, channel: string,
     .text()
     .replace(/\s+/g, ' ')
     .trim()
-
-  const fallbackUrl = `https://t.me/${encodeURIComponent(channel.replace(/^@/, ''))}/${encodeURIComponent(postId)}`
-  const rawUrl = (player.attr('href') || fallbackUrl).trim()
-  let url = fallbackUrl
-
-  try {
-    const parsedUrl = new URL(rawUrl, 'https://t.me')
-    if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
-      url = parsedUrl.toString()
-    }
-  }
-  catch {
-    // Fall back to the canonical Telegram post URL.
-  }
+  const url = getTelegramPostUrl(channel, postId, player.attr('href'))
 
   return { duration, url }
+}
+
+function getDocumentAttachments(
+  $: cheerio.CheerioAPI,
+  messageNode: cheerio.Cheerio<any>,
+  channel: string,
+  postId: string,
+): DocumentAttachment[] {
+  return messageNode
+    .find('.tgme_widget_message_document_wrap')
+    .toArray()
+    .map((document) => {
+      const documentNode = $(document)
+      const name = documentNode
+        .find('.tgme_widget_message_document_title')
+        .first()
+        .text()
+        .replace(/\s+/g, ' ')
+        .trim()
+      const size = documentNode
+        .find('.tgme_widget_message_document_extra')
+        .first()
+        .text()
+        .replace(/\s+/g, ' ')
+        .trim()
+      const url = getTelegramPostUrl(channel, postId, documentNode.attr('href'))
+
+      return { name, size, url }
+    })
 }
 
 function getLinkPreview($: cheerio.CheerioAPI, item: cheerio.Element, staticProxy: string, _index: number) {
@@ -542,6 +575,7 @@ async function getPost(
   const title = text.match(/^.*?(?=[。\n]|http\S)/g)?.[0] ?? text
   const id = messageNode.attr('data-post')?.replace(new RegExp(`${channel}/`, 'i'), '') || ''
   const unavailableMedia = getUnavailableMedia(messageNode, channel, id)
+  const attachments = getDocumentAttachments($, messageNode, channel, id)
 
   const tags = contentNode
     .find('a[href^="?q="]')
@@ -561,7 +595,6 @@ async function getPost(
     getImageStickers($, messageNode[0], staticProxy, index),
     getVideoStickers($, messageNode[0], staticProxy, index),
     messageNode.find('.tgme_widget_message_poll')?.html(),
-    $.html(messageNode.find('.tgme_widget_message_document_wrap')),
     $.html(messageNode.find('.tgme_widget_message_location_wrap')),
     getLinkPreview($, messageNode[0], staticProxy, index),
   ]
@@ -584,6 +617,7 @@ async function getPost(
     text,
     content: sanitizePostHtml(rawContent),
     ...(unavailableMedia ? { unavailableMedia } : {}),
+    ...(attachments.length > 0 ? { attachments } : {}),
     reactions: reactionsEnabled ? getReactions($, messageNode[0], staticProxy) : [],
   }
 }

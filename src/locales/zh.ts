@@ -44,6 +44,9 @@ export const zhMessages: LocaleMessages = {
     unavailableMedia: '此帖子包含无法在此处预览的大型视频。',
     unavailableMediaWithDuration: '此帖子包含一段时长为{duration}、无法在此处预览的大型视频。',
     viewOriginalOnTelegram: '在 Telegram 上查看原帖',
+    attachmentFallbackName: '附件',
+    attachmentTelegramOnly: 'Telegram 未提供此文件的网页直接下载链接。',
+    openAttachmentOnTelegram: '在 Telegram 中打开附件',
   },
   post: {
     backToFeed: '返回动态',

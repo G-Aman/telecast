@@ -11,6 +11,12 @@ export interface UnavailableMedia {
   url: string
 }
 
+export interface DocumentAttachment {
+  name: string
+  size: string
+  url: string
+}
+
 export interface ChannelPost {
   id: string
   title: string
@@ -22,6 +28,7 @@ export interface ChannelPost {
   text: string
   content: string
   unavailableMedia?: UnavailableMedia
+  attachments?: DocumentAttachment[]
   reactions: ChannelReaction[]
 }
 
