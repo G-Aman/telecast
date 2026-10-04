@@ -135,7 +135,13 @@ export function PostCard({
                           {attachment.name || messages.feed.attachmentFallbackName}
                         </p>
                         <p>
-                          {attachment.size ? `${attachment.size} · ` : null}
+                          {attachment.size
+                            ? (
+                                <span className="mr-1.5 inline-flex items-center whitespace-nowrap rounded-full border bg-background/80 px-2 py-px text-[11px] font-medium leading-4 text-foreground">
+                                  {attachment.size}
+                                </span>
+                              )
+                            : null}
                           {messages.feed.attachmentTelegramOnly}
                           {' '}
                           <a
