@@ -116,37 +116,43 @@ export function PostCard({
               )
             : null}
 
-          {post.attachments?.map(attachment => (
-            <div
-              key={`${attachment.url}-${attachment.name}`}
-              className="mb-3 flex items-start gap-2 rounded-lg border bg-muted/60 px-3 py-2 text-[13px] leading-5 text-muted-foreground"
-              role="note"
-            >
-              <FileArchive className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-              <div className="min-w-0">
-                <p className="truncate font-medium text-foreground" title={attachment.name || messages.feed.attachmentFallbackName}>
-                  {attachment.name || messages.feed.attachmentFallbackName}
-                </p>
-                <p>
-                  {attachment.size ? `${attachment.size} · ` : null}
-                  {messages.feed.attachmentTelegramOnly}
-                  {' '}
-                  <a
-                    href={attachment.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="link-smooth font-medium text-foreground"
-                  >
-                    {messages.feed.openAttachmentOnTelegram}
-                  </a>
-                  .
-                </p>
-              </div>
-            </div>
-          ))}
-
           {post.content
             ? <div className="prose-telegram" dangerouslySetInnerHTML={{ __html: post.content }} />
+            : null}
+
+          {post.attachments?.length
+            ? (
+                <div className="mt-3 space-y-2">
+                  {post.attachments.map(attachment => (
+                    <div
+                      key={`${attachment.url}-${attachment.name}`}
+                      className="flex items-start gap-2 rounded-lg border bg-muted/60 px-3 py-2 text-[13px] leading-5 text-muted-foreground"
+                      role="note"
+                    >
+                      <FileArchive className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-foreground" title={attachment.name || messages.feed.attachmentFallbackName}>
+                          {attachment.name || messages.feed.attachmentFallbackName}
+                        </p>
+                        <p>
+                          {attachment.size ? `${attachment.size} · ` : null}
+                          {messages.feed.attachmentTelegramOnly}
+                          {' '}
+                          <a
+                            href={attachment.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="link-smooth font-medium text-foreground"
+                          >
+                            {messages.feed.openAttachmentOnTelegram}
+                          </a>
+                          .
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
             : null}
 
           {post.tags.length > 0
